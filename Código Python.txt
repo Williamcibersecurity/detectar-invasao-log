@@ -1,0 +1,53 @@
+import sys
+
+def detectar_invasao(registros):
+    # Variáveis para rastrear o ID do usuário atual e suas falhas consecutivas
+    usuario_atual = None
+    tentativas_consecutivas = 0
+
+    # Percorre cada registro de log
+    for registro in registros:
+        # Separa o ID do usuário e o status do registro (sucesso ou falha)
+        id_usuario, status = registro.split(":")
+        id_usuario = id_usuario.strip()
+        status = status.strip()
+
+        # Verifica se o usuário atual é o mesmo da iteração anterior
+        if id_usuario == usuario_atual:
+            if status == "falha":
+                tentativas_consecutivas += 1
+                # Se o usuário teve mais de 3 falhas consecutivas, retorne o invasor
+                if tentativas_consecutivas > 3:
+                    return id_usuario
+            else:
+                # Se a tentativa foi bem-sucedida, reseta o contador de falhas
+                tentativas_consecutivas = 0
+        else:
+            # Atualiza para o novo usuário e reinicia a contagem de tentativas falhas
+            usuario_atual = id_usuario
+            tentativas_consecutivas = 1 if status == "falha" else 0
+
+    # Se nenhum invasor for detectado, retorna a mensagem padrão
+    return "Nenhum invasor detectado"
+
+# Função principal para executar o programa
+def main():
+    # Lê os registros de log da entrada padrão
+    entrada = sys.stdin.readline().strip()
+    
+    if not entrada:
+        print("Nenhum invasor detectado")
+        return
+
+    # Processa os registros para garantir que sejam válidos
+    registros = [registro.strip() for registro in entrada.split(",") if registro]
+
+    # Chama a função para detectar tentativas de invasão
+    resultado = detectar_invasao(registros)
+
+    # Imprime o resultado na saída padrão
+    print(resultado)
+
+# Chama a função principal para executar o programa
+if __name__ == "__main__":
+    main()
